@@ -128,9 +128,3 @@ Analix está desarrollando **Miauzap Chat**, una plataforma SaaS CRM robusta par
 **Contáctanos:**
 * Correo electrónico: degoisbento@gmail.com
 * Teléfono / WhatsApp: 555499060754
-"""
-
-with open("README.md", "w", encoding="utf-8") as f:
-    f.write(readme_content)
-
-print("File generated successfully.")
