@@ -1,3 +1,4 @@
+<div align="center">
   <h1>MiauZap 🐈‍⬛</h1>
   <p><b>The Ultimate WhatsApp API for Chatwoot | A Melhor API de WhatsApp para Chatwoot | La Mejor API de WhatsApp para Chatwoot</b></p>
 </div>
@@ -133,13 +134,3 @@ with open("README.md", "w", encoding="utf-8") as f:
     f.write(readme_content)
 
 print("File generated successfully.")
-Mantener una API de alta calidad con actualizaciones constantes requiere tiempo y recursos. Si MiauZap está ahorrando tiempo y dinero a tu negocio, ¡definitivamente vale una contribución de 10 dólares para mantener el proyecto vivo y en crecimiento! Apóyanos para asegurarte de tener siempre las mejores herramientas a tu disposición.
-
-🏢 ¿Buscas un CRM Completo?
-Analix está desarrollando Miauzap Chat, una plataforma SaaS CRM robusta para WhatsApp, enfocada en múltiples agentes y departamentos. Si necesitas un ecosistema de atención al cliente completo y listo para usar, ¡queremos hablar contigo!
-
-Contáctanos:
-
-Correo electrónico: degoisbento@gmail.com
-
-Teléfono / WhatsApp: +55 54 9906-0754
