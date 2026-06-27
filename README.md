@@ -366,17 +366,7 @@ Check the [API Reference](https://github.com/analixbi/miauzap/blob/main/API.md)
 
 ## Contributors
 
-<table>
-<tr>
-    <td align="center" style="word-wrap: break-word; width: 150.0; height: 150.0">
-        <a href="https://github.com/analixbi">
-            <img src="https://avatars.githubusercontent.com/u/25182694?v=4" width="100;" style="border-radius:50%;align-items:center;justify-content:center;overflow:hidden;padding-top:10px" alt="analixbi"/>
-            <br />
-            <sub style="font-size:14px"><b>analixbi</b></sub>
-        </a>
-    </td>
-</tr>
-</table>
+* **analixbi** - [GitHub Profile](https://github.com/analixbi)
 
 ## Clients
 
