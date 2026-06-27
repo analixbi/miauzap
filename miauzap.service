@@ -1,0 +1,16 @@
+[Unit]
+Description=Miauzap
+After=network.target
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5s
+StandardOutput=append:/var/log/miauzap/output.log
+StandardError=append:/var/log/miauzap/error.log
+User=root
+WorkingDirectory=/usr/local/miauzap
+ExecStart=/usr/local/miauzap/miauzap -wadebug DEBUG
+
+[Install]
+WantedBy=multi-user.target

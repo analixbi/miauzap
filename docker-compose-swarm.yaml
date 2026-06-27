@@ -1,0 +1,86 @@
+﻿version: "3.7"
+
+services:
+  miauzap-server:
+    image: analix/miauzap:latest
+    networks:
+      - network_public
+    environment:
+      - MIAUZAP_ADMIN_TOKEN=${MIAUZAP_ADMIN_TOKEN}
+      - DB_USER=${DB_USER:-miauzap}
+      - DB_PASSWORD=${DB_PASSWORD:-miauzap}
+      - DB_NAME=${DB_NAME:-miauzap}
+      - DB_HOST=db
+
+      - DB_PORT=${DB_PORT:-5432}
+      - TZ=${TZ:-America/Sao_Paulo}
+      - WEBHOOK_FORMAT=${WEBHOOK_FORMAT:-json}
+      - SESSION_DEVICE_NAME=${SESSION_DEVICE_NAME:-Miauzap}
+      # RabbitMQ configuration Optional
+      - RABBITMQ_URL=amqp://miauzap:miauzap@rabbitmq:5672/
+      - RABBITMQ_QUEUE=whatsapp_events
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == manager]
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512MB
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.miauzap-server.rule=Host(`api.miauzap.app`)
+        - traefik.http.routers.miauzap-server.entrypoints=websecure
+        - traefik.http.routers.miauzap-server.priority=1
+        - traefik.http.routers.miauzap-server.tls.certresolver=letsencryptresolver
+        - traefik.http.routers.miauzap-server.service=miauzap-server
+        - traefik.http.services.miauzap-server.loadbalancer.server.port=${MIAUZAP_PORT:-8080}
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 3
+    #   start_period: 10s
+
+  # RabbitMQ service OPTIONAL
+  rabbitmq:
+    image: rabbitmq:3-management
+    hostname: rabbitmq
+    networks:
+      - network_public
+    environment:
+      - RABBITMQ_DEFAULT_USER=miauzap
+      - RABBITMQ_DEFAULT_PASS=miauzap
+      - RABBITMQ_DEFAULT_VHOST=/
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == manager]
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256MB
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.rabbitmq-management.rule=Host(`rabbitmq.miauzap.app`)
+        - traefik.http.routers.rabbitmq-management.entrypoints=websecure
+        - traefik.http.routers.rabbitmq-management.priority=1
+        - traefik.http.routers.rabbitmq-management.tls.certresolver=letsencryptresolver
+        - traefik.http.routers.rabbitmq-management.service=rabbitmq-management
+        - traefik.http.services.rabbitmq-management.loadbalancer.server.port=15672
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+volumes:
+  rabbitmq_data:
+
+networks:
+  network_public:
+    name: network_public
+    external: true

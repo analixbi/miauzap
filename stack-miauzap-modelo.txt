@@ -1,0 +1,80 @@
+version: "3.7"
+
+services:
+  miauzap:
+    image: analixbi/miauzap:develop
+    volumes:
+      - miauzap_dbdata:/app/dbdata
+      - miauzap_files:/app/files
+    networks:
+      - Analixnet
+    environment:
+      # Credenciais / App
+      - MIAUZAP_ADMIN_TOKEN=SUA_CHAVE_ADMIN_AQUI
+      - SECRET_KEY=SUA_SECRET_KEY_AQUI
+      - SERVER_URL=https://api.seudominio.com.br
+      - SESSION_DEVICE_NAME=Miauzap
+      - MIAUZAP_ADDRESS=0.0.0.0
+      - MIAUZAP_GLOBAL_ENCRYPTION_KEY=CHAVE_DE_CRIPTOGRAFIA_GLOBAL
+      - MIAUZAP_GLOBAL_HMAC_KEY=CHAVE_HMAC_GLOBAL
+
+      # RabbitMQ
+      - RABBITMQ_USER=miauzap
+      - RABBITMQ_PASSWORD=SUA_SENHA_RABBITMQ
+      - RABBITMQ_URL=amqp://miauzap:SUA_SENHA_RABBITMQ@rabbitmq:5672/
+      - RABBITMQ_QUEUE=whatsapp_events
+
+      # Postgres (Caso use banco externo ou container separado)
+      - DB_HOST=postgres
+      - DB_USER=miauzap
+      - DB_PASSWORD=SUA_SENHA_POSTGRES
+      - DB_NAME=miauzap
+      - DB_PORT=5432
+      - DB_DRIVER=postgres
+
+      # Timezone / Webhook
+      - TZ=America/Sao_Paulo
+      - WEBHOOK_FORMAT=json
+
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.miauzap.rule=Host(`api.seudominio.com.br`)
+        - traefik.http.services.miauzap.loadbalancer.server.port=8080
+        - traefik.http.routers.miauzap.service=miauzap
+        - traefik.http.routers.miauzap.tls.certresolver=letsencryptresolver
+        - traefik.http.routers.miauzap.entrypoints=websecure
+        - traefik.http.routers.miauzap.tls=true
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    networks:
+      - Analixnet
+    environment:
+      - RABBITMQ_DEFAULT_USER=miauzap
+      - RABBITMQ_DEFAULT_PASS=SUA_SENHA_RABBITMQ
+      - RABBITMQ_DEFAULT_VHOST=/
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+volumes:
+  miauzap_dbdata:
+    external: true
+    name: miauzap_dbdata
+  miauzap_files:
+    external: true
+    name: miauzap_files
+
+networks:
+  Analixnet:
+    external: true
+    name: Analixnet

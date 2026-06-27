@@ -1,0 +1,205 @@
+﻿# ============================================
+# DOCKER COMPOSE - PRODUCTION READY
+# ============================================
+# Miauzap WhatsApp API with Traefik support
+# Compatible with Portainer deployment
+# ============================================
+
+services:
+  # ============================================
+  # MIAUZAP SERVER
+  # ============================================
+  miauzap-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: analixbi/miauzap:v1.0.0
+    container_name: miauzap-server
+
+    # Port mapping (comment out if using Traefik)
+    ports:
+      - "${MIAUZAP_PORT:-8080}:8080"
+
+    environment:
+      # Server Configuration
+      - SERVER_URL=${SERVER_URL:-http://localhost:8080}
+      - MIAUZAP_ADMIN_TOKEN=${MIAUZAP_ADMIN_TOKEN}
+      - MIAUZAP_GLOBAL_ENCRYPTION_KEY=${MIAUZAP_GLOBAL_ENCRYPTION_KEY}
+      - MIAUZAP_GLOBAL_HMAC_KEY=${MIAUZAP_GLOBAL_HMAC_KEY:-}
+      - MIAUZAP_GLOBAL_WEBHOOK=${MIAUZAP_GLOBAL_WEBHOOK:-}
+
+      # Database Configuration
+      - DB_USER=${DB_USER:-miauzap}
+      - DB_PASSWORD=${DB_PASSWORD:-miauzap}
+      - DB_NAME=${DB_NAME:-miauzap}
+      - DB_HOST=db
+      - DB_PORT=${DB_PORT:-5432}
+
+      # General Configuration
+      - TZ=${TZ:-America/Sao_Paulo}
+      - WEBHOOK_FORMAT=${WEBHOOK_FORMAT:-json}
+      - SESSION_DEVICE_NAME=${SESSION_DEVICE_NAME:-Miauzap}
+
+      # RabbitMQ Configuration (Optional)
+      - RABBITMQ_URL=${RABBITMQ_URL:-amqp://miauzap:miauzap@rabbitmq:5672/}
+      - RABBITMQ_QUEUE=${RABBITMQ_QUEUE:-whatsapp_events}
+
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+    networks:
+      - miauzap-network
+      # Uncomment the line below when using Traefik
+      # - traefik-public
+
+    restart: unless-stopped
+    # ============================================
+    # TRAEFIK LABELS (Uncomment for production)
+    # ============================================
+    # Uncomment all labels below when deploying with Traefik
+    # Make sure to set TRAEFIK_DOMAIN in your .env file
+
+    # labels:
+    #   # Enable Traefik
+    #   - "traefik.enable=true"
+    #   
+    #   # Docker network to use
+    #   - "traefik.docker.network=${TRAEFIK_NETWORK:-traefik-public}"
+    #   
+    #   # HTTP Router
+    #   - "traefik.http.routers.miauzap.rule=Host(`${TRAEFIK_DOMAIN}`)"
+    #   - "traefik.http.routers.miauzap.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}"
+    #   - "traefik.http.routers.miauzap.tls=true"
+    #   - "traefik.http.routers.miauzap.tls.certresolver=letsencrypt"
+    #   
+    #   # Service
+    #   - "traefik.http.services.miauzap.loadbalancer.server.port=8080"
+    #   
+    #   # Middleware (Optional - uncomment if needed)
+    #   # - "traefik.http.routers.miauzap.middlewares=miauzap-headers"
+    #   # - "traefik.http.middlewares.miauzap-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
+    #   
+    #   # HTTP to HTTPS redirect (Optional)
+    #   # - "traefik.http.routers.miauzap-http.rule=Host(`${TRAEFIK_DOMAIN}`)"
+    #   # - "traefik.http.routers.miauzap-http.entrypoints=web"
+    #   # - "traefik.http.routers.miauzap-http.middlewares=miauzap-redirect"
+    #   # - "traefik.http.middlewares.miauzap-redirect.redirectscheme.scheme=https"
+    #   # - "traefik.http.middlewares.miauzap-redirect.redirectscheme.permanent=true"
+
+    # ============================================
+    # POSTGRESQL DATABASE
+    # ============================================
+  db:
+    image: postgres:16-alpine
+    container_name: miauzap-db
+
+    environment:
+      POSTGRES_USER: ${DB_USER:-miauzap}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-miauzap}
+      POSTGRES_DB: ${DB_NAME:-miauzap}
+      PGDATA: /var/lib/postgresql/data/pgdata
+
+    # Uncomment to access database directly from host
+    # ports:
+    #   - "${DB_PORT:-5432}:5432"
+
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+    networks:
+      - miauzap-network
+
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER:-miauzap}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+    restart: unless-stopped
+
+  # ============================================
+  # RABBITMQ MESSAGE BROKER
+  # ============================================
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: miauzap-rabbitmq
+    hostname: rabbitmq
+
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-miauzap}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-miauzap}
+      RABBITMQ_DEFAULT_VHOST: /
+
+    # Uncomment to access RabbitMQ management UI from host
+    # ports:
+    #   - "5672:5672"   # AMQP port
+    #   - "15672:15672" # Management UI port
+
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+    networks:
+      - miauzap-network
+
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+    restart: unless-stopped
+
+# ============================================
+# NETWORKS
+# ============================================
+networks:
+  # Internal network for services communication
+  miauzap-network:
+    driver: bridge
+    name: ${COMPOSE_PROJECT_NAME:-miauzap}_network
+  # External Traefik network (uncomment when using Traefik)
+  # traefik-public:
+  #   external: true
+  #   name: ${TRAEFIK_NETWORK:-traefik-public}
+
+  # ============================================
+  # VOLUMES
+  # ============================================
+volumes:
+  db_data:
+    name: ${COMPOSE_PROJECT_NAME:-miauzap}_db_data
+  rabbitmq_data:
+    name: ${COMPOSE_PROJECT_NAME:-miauzap}_rabbitmq_data
+
+# ============================================
+# DEPLOYMENT NOTES
+# ============================================
+#
+# LOCAL DEVELOPMENT:
+# 1. Copy .env.sample to .env
+# 2. Configure your environment variables
+# 3. Run: docker compose up -d
+# 4. Access: http://localhost:8080
+#
+# PRODUCTION WITH TRAEFIK:
+# 1. Ensure Traefik is running with network 'traefik-public'
+# 2. Set SERVER_URL=https://yourdomain.com in .env
+# 3. Set TRAEFIK_DOMAIN=yourdomain.com in .env
+# 4. Uncomment Traefik labels in miauzap-server service
+# 5. Uncomment traefik-public network in miauzap-server
+# 6. Uncomment traefik-public in networks section
+# 7. Comment out ports section in miauzap-server
+# 8. Run: docker compose up -d
+# 9. Access: https://yourdomain.com
+#
+# PORTAINER DEPLOYMENT:
+# 1. Upload this docker-compose.yml to Portainer
+# 2. Configure environment variables in Portainer UI
+# 3. Deploy stack
+#
+# ============================================

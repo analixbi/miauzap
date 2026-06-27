@@ -1,0 +1,117 @@
+.mzw-otp-box {
+	border: 1px solid rgba(0, 0, 0, 0.12);
+	box-sizing: border-box;
+	clear: both;
+	display: block;
+	margin: 24px 0;
+	overflow: visible;
+	padding: 14px;
+	position: relative;
+	z-index: 1;
+}
+
+.mzw-otp-box::after {
+	clear: both;
+	content: "";
+	display: table;
+}
+
+.woocommerce-account .mzw-otp-box {
+	margin-bottom: 36px;
+}
+
+.woocommerce .mzw-otp-box p {
+	margin: 0 0 14px;
+}
+
+.mzw-otp-box h3 {
+	font-size: 18px;
+	line-height: 1.25;
+	margin-bottom: 12px;
+	margin-top: 0;
+}
+
+.mzw-otp-box input[type="tel"],
+.mzw-otp-box input[type="text"] {
+	box-sizing: border-box;
+	display: block;
+	max-width: 100%;
+	width: 100%;
+}
+
+.mzw-otp-message {
+	font-size: 14px;
+	margin: 0 0 12px;
+}
+
+.mzw-otp-message.is-error {
+	color: #b32d2e;
+}
+
+.mzw-otp-code-wrap {
+	clear: both;
+	display: block;
+	margin-top: 14px;
+	padding-top: 4px;
+	position: relative;
+	z-index: 2;
+}
+
+.mzw-otp-code-wrap[hidden] {
+	display: none !important;
+}
+
+.mzw-otp-code-wrap .mzw-otp-code {
+	margin-bottom: 10px;
+}
+
+.mzw-otp-code-wrap .mzw-verify-otp {
+	display: inline-flex;
+	justify-content: center;
+	min-width: 112px;
+}
+
+.mzw-whatsapp-button {
+	align-items: center;
+	background: #25d366;
+	border-color: #1fb255;
+	color: #fff;
+	display: inline-flex;
+	font-size: 14px;
+	gap: 8px;
+	justify-content: center;
+	line-height: 1.2;
+}
+
+.mzw-whatsapp-button:hover,
+.mzw-whatsapp-button:focus {
+	background: #1fb255;
+	border-color: #179848;
+	color: #fff;
+}
+
+.mzw-whatsapp-icon {
+	display: inline-flex;
+	height: 18px;
+	width: 18px;
+}
+
+.mzw-whatsapp-icon svg {
+	display: block;
+	fill: currentColor;
+	height: 100%;
+	width: 100%;
+}
+
+@media (max-width: 768px) {
+	.woocommerce-account .u-columns .u-column1,
+	.woocommerce-account .u-columns .u-column2 {
+		float: none;
+		width: 100%;
+	}
+
+	.woocommerce-account .u-columns .u-column2 {
+		clear: both;
+		margin-top: 24px;
+	}
+}
