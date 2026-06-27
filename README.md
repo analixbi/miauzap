@@ -15,8 +15,23 @@
   <br>
   <i>Scan to Donate via PayPal / Faça a leitura para doar via PayPal / Escanea para donar vía PayPal</i>
 </div>
+---
+
+## 🎁 Brinde Especial: Plugin WooCommerce para WordPress! / Special Bonus: WooCommerce WordPress Plugin!
+
+Miauzap includes a complete, production-ready WordPress plugin for WooCommerce integration as a free bonus! You can find it inside the [`wordpress-plugin`](wordpress-plugin/) directory (available as both source code and a pre-packaged `.zip` file).
+
+### 🚀 Principais Funcionalidades do Plugin / Key Plugin Features:
+* 🔐 **Login por OTP via WhatsApp:** Permita que seus clientes façam login seguro sem senhas tradicionais.
+* 📦 **Mensagens automáticas por status de pedido:** Envie notificações automáticas de atualização de pedido (como códigos de rastreio, envio, etc.) usando variáveis dinâmicas.
+* 🔀 **Instâncias com rotação ponderada:** Faça a rotação automática de múltiplas instâncias do Miauzap para balanceamento de carga e segurança contra banimentos.
+* 🕒 **Fila inteligente com controle anti-ban:** Fila com atraso aleatório configurável, limites de disparo por dia por instância e horário silencioso (evita mensagens de madrugada).
+* 📝 **Campos personalizados:** Suporta variáveis dinâmicas de anotações de pedidos e campos personalizados/meta do WooCommerce (como códigos de rastreio dos Correios).
+
+Consulte o [**README do Plugin**](wordpress-plugin/miauzap-woocommerce/README.md) para obter instruções detalhadas de instalação e configuração.
 
 ---
+
 
 Whatsmeow does not use Puppeteer on headless Chrome, nor an Android emulator. It communicates directly with WhatsApp’s WebSocket servers, making it significantly faster and much less demanding on memory and CPU than those solutions. The drawback is that any changes to the WhatsApp protocol could break connections, requiring a library update.
 
